@@ -11,6 +11,9 @@ const Alert = (props) => {
     if (alertText === "Empty List") {
       colorVal = "alert-danger";
     }
+    if (alertText === "Item updated successfully") {
+      colorVal = "alert-success";
+    }
   }
 
   return (

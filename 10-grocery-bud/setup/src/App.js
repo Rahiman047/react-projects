@@ -18,21 +18,44 @@ function App() {
   const [alertText, showAlertText] = useState("");
   const [editItem, updateEditItem] = useState("");
   const [isEditing, updateIsEditing] = useState(false);
+  const [valChanged, updateValueToBeChanged] = useState("");
 
   const itemsAdded = (e) => {
     e.preventDefault();
-    const newItem = { id: new Date().getTime().toString(), title: item };
-    updateGroceryItems((groceryItems) => {
-      return [...groceryItems, newItem];
-    });
-    addItems("");
-    showAlert(true);
-    if (Alert) {
-      showAlertText("Item Added to the List");
-      setTimeout(() => {
-        showAlertText("");
-        showAlert(false);
-      }, 2000);
+    if (!isEditing) {
+      const newItem = { id: new Date().getTime().toString(), title: item };
+      updateGroceryItems((groceryItems) => {
+        return [...groceryItems, newItem];
+      });
+      addItems("");
+      showAlert(true);
+      if (Alert) {
+        showAlertText("Item Added to the List");
+        setTimeout(() => {
+          showAlertText("");
+          showAlert(false);
+        }, 2000);
+      }
+    }
+    if (isEditing) {
+      updateGroceryItems(
+        groceryItems.map((eachGrocery) => {
+          if (eachGrocery.id === valChanged) {
+            return { ...eachGrocery, title: editItem };
+          }
+          return eachGrocery;
+        })
+      );
+      updateIsEditing(false);
+      addItems("");
+      showAlert(true);
+      if (Alert) {
+        showAlertText("Item updated successfully");
+        setTimeout(() => {
+          showAlertText("");
+          showAlert(false);
+        }, 2000);
+      }
     }
   };
 
@@ -76,12 +99,11 @@ function App() {
 
   const editParticularItem = (id) => {
     updateIsEditing(true);
-    const editVal = groceryItems.filter((eachItem) => eachItem.id === id);
-    let editItem = editVal[0];
-    let { title } = editItem;
-    if (isEditing) {
-      updateEditItem(title);
-    }
+    updateValueToBeChanged(id);
+  };
+
+  const updateEditingValue = (e) => {
+    updateEditItem(e.target.value);
   };
 
   return (
@@ -90,18 +112,34 @@ function App() {
         {alert && <Alert alertText={alertText} />}
         <form className="grocery-form" onSubmit={itemsAdded}>
           <h3>Grocery Bud</h3>
-          <div className="form-control">
-            <input
-              type="text"
-              className="grocery"
-              placeholder="e.g eggs"
-              onChange={(e) => addItems(e.target.value)}
-              value={item}
-            />
-            <button type="submit" className="submit-btn">
-              Submit
-            </button>
-          </div>
+          {!isEditing && (
+            <div className="form-control">
+              <input
+                type="text"
+                className="grocery"
+                placeholder="e.g eggs"
+                onChange={(e) => addItems(e.target.value)}
+                value={item}
+              />
+              <button type="submit" className="submit-btn">
+                Submit
+              </button>
+            </div>
+          )}
+          {isEditing && (
+            <div className="form-control">
+              <input
+                type="text"
+                className="grocery"
+                placeholder="e.g eggs"
+                onChange={updateEditingValue}
+                value={editItem}
+              />
+              <button type="submit" className="submit-btn">
+                Edit
+              </button>
+            </div>
+          )}
         </form>
         <div className="grocery-container">
           {groceryItems.map((eachGrocery) => (

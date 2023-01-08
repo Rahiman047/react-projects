@@ -1,4 +1,4 @@
-import React, { useState, useContext, useReducer, useEffect } from "react";
+import React, { useContext, useReducer, useEffect } from "react";
 import cartItems from "./data";
 import reducer from "./reducer";
 // ATTENTION!!!!!!!!!!
@@ -26,12 +26,27 @@ const AppProvider = ({ children }) => {
   };
 
   const increaseAmount = (id) => {
-    dispatch({ type: "INCREASE_AMOUNT", payload: id });
+    dispatch({ type: "INCREASE_AMOUNT", payload: id }); //we will change each amount inside the cartItems but not on the InitialState.amount
   };
 
   const decreaseAmount = (id) => {
-    dispatch({ type: "DECREASE_AMOUNT", payload: id });
+    dispatch({ type: "DECREASE_AMOUNT", payload: id }); //we will change each amount inside the cartItems but not on the InitialState.amount
   };
+
+  const fetchData = async () => {
+    dispatch({ type: "LOADING" });
+    const response = await fetch(url);
+    const data = await response.json();
+    dispatch({ type: "DISPLAY_ITEMS", payload: data });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    dispatch({ type: "GET_TOTALS" }); //we will get amount inside the InitialState.amount
+  }, [state.cart]);
 
   return (
     <AppContext.Provider
